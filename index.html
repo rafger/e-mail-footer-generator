@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Stopka adresowa email</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 50px;
+      padding: 0;
+    }
+
+    div {padding-bottom: 5px}
+    
+    footer {
+      background-color: #f5f5f5;
+      color: #333;
+      padding: 20px;
+      padding-bottom: 30px;
+      text-align: left;
+    }
+    
+    .name {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    
+    .location {
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    
+    .logo {
+      width: 150px;
+      height: auto;
+      margin-bottom: 10px;
+    }
+    
+    .footer-link {
+      display: inline-block;
+      margin-right: 10px;
+      color: #333;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    
+    .footer-link:hover {
+      color: #ffcc00;
+    }
+    
+    .footer-text {
+      font-size: 12px;
+      margin-top: 10px;
+    }
+
+    .code-container {
+      position: relative;
+      margin-top: 20px;
+    }
+
+    #code {
+      font-family: monospace;
+      background-color: #f9f9f9;
+      border: 1px solid #ccc;
+      padding: 10px;
+      white-space: pre-wrap;
+    }
+
+    .copy-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 8px 16px;
+      font-size: 14px;
+      background-color: #00AEFF;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .copy-button:hover {
+      background-color: #0095DD;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <label for="name">Imię:</label>
+    <input type="text" id="name">
+  </div>
+  <div>
+    <label for="last-name">Nazwisko:</label>
+    <input type="text" id="last-name">
+  </div>
+  <div>
+    <label for="city">Miasto:</label>
+    <input type="text" id="city">
+  </div>
+  <div>
+    <label for="website">Adres internetowy firmy:</label>
+    <input type="text" id="website">
+  </div>
+  <button onclick="generateCode()">Generuj kod</button>
+  <div class="code-container">
+    <pre id="code"></pre>
+    <button class="copy-button" onclick="copyCode()">Kopiuj kod</button>
+  </div>
+
+  <script>
+    function generateCode() {
+      // Pobranie danych z pól formularza
+      const nameInput = document.getElementById('name').value;
+      const lastNameInput = document.getElementById('last-name').value;
+      const cityInput = document.getElementById('city').value;
+      const websiteInput = document.getElementById('website').value;
+
+      // Generowanie kodu na podstawie wpisanych danych
+      const code = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Stopka adresowa email</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    
+    footer {
+      background-color: #f5f5f5;
+      color: #333;
+      padding: 20px;
+      padding-bottom: 30px;
+      text-align: left;
+    }
+    
+    .name {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    
+    .location {
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    
+    .logo {
+      width: auto;
+      height: auto;
+      margin-bottom: 10px;
+    }
+    
+    .footer-link {
+      display: inline-block;
+      margin-right: 10px;
+      color: #333;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    
+    .footer-link:hover {
+      color: #ffcc00;
+    }
+    
+    .footer-text {
+      font-size: 12px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <footer>
+    <small><p><i>Zapraszam do kontaktu i współpracy</i></p></small>
+    <a href="http://linkedin.com/in/${lastNameInput}" class="footer-link"><div class="name">${nameInput} ${lastNameInput}</div></a>
+    <div class="location">${cityInput}, Polska</div>
+    <a href="${websiteInput}">
+      <div class="footer-logo">
+        <svg xmlns="http://www.w3.org/2000/svg" width="250" height="50" viewBox="0 0 250 50">
+          <rect x="0" y="0" width="250" height="50" rx="10" fill="#00AEFF"/>
+          <text x="50%" y="50%" text-anchor="middle" alignment-baseline="central" font-size="24" font-weight="bold" fill="#fff">${websiteInput}</text>
+        </svg>
+      </div>
+    </a>
+    <div class="footer-text">
+      © 2023 <a href="http://${websiteInput}">${websiteInput}</a>. Wszelkie prawa zastrzeżone. | <a href="#" class="footer-link">Polityka prywatności RODO.</a>
+    </div>
+  </footer>
+</body>
+</html>`;
+
+      // Wyświetlanie wygenerowanego kodu na stronie
+      document.getElementById('code').textContent = code;
+    }
+
+    function copyCode() {
+      const codeElement = document.getElementById('code');
+      const code = codeElement.textContent;
+
+      // Tworzenie tymczasowego elementu textarea
+      const textarea = document.createElement('textarea');
+      textarea.value = code;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'absolute';
+      textarea.style.left = '-9999px';
+      document.body.appendChild(textarea);
+      
+      // Zaznaczanie i kopiowanie tekstu z textarea
+      textarea.select();
+      document.execCommand('copy');
+
+      // Usuwanie tymczasowego elementu textarea
+      document.body.removeChild(textarea);
+
+      // Zmiana wyglądu przycisku po skopiowaniu kodu
+      const copyButton = document.querySelector('.copy-button');
+      copyButton.textContent = 'Skopiowano!';
+      copyButton.disabled = true;
+    }
+  </script>
+</body>
+</html>
