@@ -1,226 +1,411 @@
 <!DOCTYPE html>
-<html>
+<html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <title>Stopka adresowa email</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Generator stopki e-mail</title>
   <style>
+    :root {
+      --bg: #f4f5f7;
+      --panel: #ffffff;
+      --text: #1f2328;
+      --muted: #5f6b7a;
+      --border: #d6dbe1;
+      --accent: #00AEFF;
+      --accent-hover: #0095DD;
+    }
+
+    * { box-sizing: border-box; }
+
     body {
-      font-family: Arial, sans-serif;
-      margin: 50px;
-      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      margin: 0;
+      padding: 24px 16px;
+      background: var(--bg);
+      color: var(--text);
     }
 
-    div {padding-bottom: 5px}
-    
-    footer {
-      background-color: #f5f5f5;
-      color: #333;
+    h1 { font-size: 22px; margin: 0 0 4px; }
+    .lead { color: var(--muted); margin: 0 0 24px; font-size: 14px; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(280px, 380px) 1fr;
+      gap: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 800px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
       padding: 20px;
-      padding-bottom: 30px;
-      text-align: left;
+      min-width: 0;
     }
-    
-    .name {
-      font-size: 18px;
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-    
-    .location {
+
+    .panel h2 { font-size: 16px; margin: 0 0 16px; }
+
+    fieldset { border: 0; padding: 0; margin: 0 0 16px; }
+    legend { font-size: 12px; font-weight: bold; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+
+    .field { margin-bottom: 10px; }
+    .field label { display: block; font-size: 13px; margin-bottom: 4px; }
+    .field input[type="text"],
+    .field input[type="url"],
+    .field input[type="email"],
+    .field input[type="tel"] {
+      width: 100%;
+      padding: 8px 10px;
       font-size: 14px;
-      margin-bottom: 10px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
     }
-    
-    .logo {
-      width: 150px;
-      height: auto;
-      margin-bottom: 10px;
-    }
-    
-    .footer-link {
-      display: inline-block;
-      margin-right: 10px;
-      color: #333;
-      text-decoration: none;
-      transition: color 0.3s ease;
-    }
-    
-    .footer-link:hover {
-      color: #ffcc00;
-    }
-    
-    .footer-text {
-      font-size: 12px;
-      margin-top: 10px;
+    .field input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+    .field .hint { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .field input[type="color"] { width: 48px; height: 32px; padding: 0; border: 1px solid var(--border); border-radius: 4px; }
+
+    .preview-box {
+      border: 1px dashed var(--border);
+      border-radius: 6px;
+      padding: 16px;
+      overflow-x: auto;
+      background: #fff;
     }
 
-    .code-container {
-      position: relative;
-      margin-top: 20px;
-    }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
 
-    #code {
-      font-family: monospace;
-      background-color: #f9f9f9;
-      border: 1px solid #ccc;
-      padding: 10px;
-      white-space: pre-wrap;
-    }
-
-    .copy-button {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      padding: 8px 16px;
+    button {
+      padding: 10px 16px;
       font-size: 14px;
-      background-color: #00AEFF;
-      color: #fff;
-      border: none;
       border-radius: 4px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      border: 1px solid var(--accent);
+      background: #fff;
+      color: var(--accent-hover);
+    }
+    button.primary { background: var(--accent); color: #fff; }
+    button.primary:hover { background: var(--accent-hover); }
+    button:hover { border-color: var(--accent-hover); }
+
+    .status { font-size: 13px; color: #1a7f37; min-height: 18px; }
+
+    details { margin-top: 8px; }
+    summary { cursor: pointer; font-size: 14px; }
+    #code {
+      font-family: Consolas, Menlo, monospace;
+      font-size: 12px;
+      background: #f9f9f9;
+      border: 1px solid var(--border);
+      padding: 10px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      max-height: 300px;
+      overflow: auto;
     }
 
-    .copy-button:hover {
-      background-color: #0095DD;
-    }
+    .howto { font-size: 13px; color: var(--muted); line-height: 1.5; }
+    .howto h3 { font-size: 14px; color: var(--text); margin: 16px 0 4px; }
+    .howto ol { margin: 0; padding-left: 20px; }
   </style>
 </head>
 <body>
-  <div>
-    <label for="name">Imię:</label>
-    <input type="text" id="name">
-  </div>
-  <div>
-    <label for="last-name">Nazwisko:</label>
-    <input type="text" id="last-name">
-  </div>
-  <div>
-    <label for="city">Miasto:</label>
-    <input type="text" id="city">
-  </div>
-  <div>
-    <label for="website">Adres internetowy firmy:</label>
-    <input type="text" id="website">
-  </div>
-  <button onclick="generateCode()">Generuj kod</button>
-  <div class="code-container">
-    <pre id="code"></pre>
-    <button class="copy-button" onclick="copyCode()">Kopiuj kod</button>
+  <div class="layout">
+    <header style="grid-column: 1 / -1;">
+      <h1>Generator stopki e-mail</h1>
+      <p class="lead">Wypełnij pola, sprawdź podgląd i kliknij „Kopiuj stopkę”, a potem wklej ją w ustawieniach podpisu Gmaila lub Outlooka.</p>
+    </header>
+
+    <form class="panel" id="form" autocomplete="on" onsubmit="return false">
+      <h2>Dane</h2>
+      <fieldset>
+        <legend>Osoba</legend>
+        <div class="field"><label for="firstName">Imię</label><input type="text" id="firstName" placeholder="Adam"></div>
+        <div class="field"><label for="lastName">Nazwisko</label><input type="text" id="lastName" placeholder="Adamowski"></div>
+        <div class="field"><label for="jobTitle">Stanowisko</label><input type="text" id="jobTitle" placeholder="Specjalista ds. sprzedaży"></div>
+        <div class="field"><label for="city">Miasto</label><input type="text" id="city" placeholder="Warszawa"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Kontakt</legend>
+        <div class="field"><label for="phone">Telefon</label><input type="tel" id="phone" placeholder="+48 600 000 000"></div>
+        <div class="field"><label for="email">E-mail</label><input type="email" id="email" placeholder="adam@example.com"></div>
+        <div class="field">
+          <label for="linkedin">Profil LinkedIn (pełny adres)</label>
+          <input type="url" id="linkedin" placeholder="https://www.linkedin.com/in/twoj-profil">
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Firma</legend>
+        <div class="field"><label for="company">Nazwa firmy</label><input type="text" id="company" placeholder="Example sp. z o.o."></div>
+        <div class="field"><label for="website">Adres strony</label><input type="text" id="website" placeholder="example.com"></div>
+        <div class="field">
+          <label for="logoUrl">Adres URL logo (opcjonalnie)</label>
+          <input type="url" id="logoUrl" placeholder="https://example.com/logo.png">
+          <div class="hint">Plik PNG lub JPG dostępny publicznie. Bez logo wyświetli się kolorowy przycisk z adresem strony.</div>
+        </div>
+        <div class="field">
+          <label for="privacyUrl">Polityka prywatności / RODO (opcjonalnie)</label>
+          <input type="url" id="privacyUrl" placeholder="https://example.com/polityka-prywatnosci">
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Wygląd</legend>
+        <div class="field"><label for="greeting">Tekst powitalny</label><input type="text" id="greeting" value="Zapraszam do kontaktu i współpracy"></div>
+        <div class="field"><label for="accent">Kolor akcentu</label><input type="color" id="accent" value="#00AEFF"></div>
+      </fieldset>
+
+      <button type="button" id="reset">Wyczyść formularz</button>
+    </form>
+
+    <section class="panel">
+      <h2>Podgląd</h2>
+      <div class="preview-box"><div id="preview"></div></div>
+
+      <div class="actions">
+        <button type="button" class="primary" id="copyRich">Kopiuj stopkę</button>
+        <button type="button" id="copyHtml">Kopiuj kod HTML</button>
+        <button type="button" id="download">Pobierz plik .html</button>
+      </div>
+      <div class="status" id="status" role="status" aria-live="polite"></div>
+
+      <details>
+        <summary>Pokaż kod HTML</summary>
+        <pre id="code"></pre>
+      </details>
+
+      <div class="howto">
+        <h3>Gmail</h3>
+        <ol>
+          <li>Kliknij „Kopiuj stopkę”.</li>
+          <li>Gmail → Ustawienia → Zobacz wszystkie ustawienia → Ogólne → Podpis.</li>
+          <li>Wklej (Ctrl+V / Cmd+V) i zapisz zmiany na dole strony.</li>
+        </ol>
+        <h3>Outlook (web i nowy Outlook)</h3>
+        <ol>
+          <li>Kliknij „Kopiuj stopkę”.</li>
+          <li>Ustawienia → Konto → Podpisy → Nowy podpis.</li>
+          <li>Wklej i zapisz.</li>
+        </ol>
+        <h3>Thunderbird i inne programy</h3>
+        <ol>
+          <li>Kliknij „Pobierz plik .html” i wskaż ten plik jako podpis z pliku HTML.</li>
+        </ol>
+      </div>
+    </section>
   </div>
 
   <script>
-    function generateCode() {
-      // Pobranie danych z pól formularza
-      const nameInput = document.getElementById('name').value;
-      const lastNameInput = document.getElementById('last-name').value;
-      const cityInput = document.getElementById('city').value;
-      const websiteInput = document.getElementById('website').value;
+    const FIELDS = ['firstName', 'lastName', 'jobTitle', 'city', 'phone', 'email', 'linkedin',
+                    'company', 'website', 'logoUrl', 'privacyUrl', 'greeting', 'accent'];
+    const STORAGE_KEY = 'email-footer-generator';
 
-      // Generowanie kodu na podstawie wpisanych danych
-      const code = `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Stopka adresowa email</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-    
-    footer {
-      background-color: #f5f5f5;
-      color: #333;
-      padding: 20px;
-      padding-bottom: 30px;
-      text-align: left;
-    }
-    
-    .name {
-      font-size: 18px;
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-    
-    .location {
-      font-size: 14px;
-      margin-bottom: 10px;
-    }
-    
-    .logo {
-      width: auto;
-      height: auto;
-      margin-bottom: 10px;
-    }
-    
-    .footer-link {
-      display: inline-block;
-      margin-right: 10px;
-      color: #333;
-      text-decoration: none;
-      transition: color 0.3s ease;
-    }
-    
-    .footer-link:hover {
-      color: #ffcc00;
-    }
-    
-    .footer-text {
-      font-size: 12px;
-      margin-top: 10px;
-    }
-  </style>
-</head>
-<body>
-  <footer>
-    <small><p><i>Zapraszam do kontaktu i współpracy</i></p></small>
-    <a href="http://linkedin.com/in/${lastNameInput}" class="footer-link"><div class="name">${nameInput} ${lastNameInput}</div></a>
-    <div class="location">${cityInput}, Polska</div>
-    <a href="${websiteInput}">
-      <div class="footer-logo">
-        <svg xmlns="http://www.w3.org/2000/svg" width="250" height="50" viewBox="0 0 250 50">
-          <rect x="0" y="0" width="250" height="50" rx="10" fill="#00AEFF"/>
-          <text x="50%" y="50%" text-anchor="middle" alignment-baseline="central" font-size="24" font-weight="bold" fill="#fff">${websiteInput}</text>
-        </svg>
-      </div>
-    </a>
-    <div class="footer-text">
-      © 2023 <a href="http://${websiteInput}">${websiteInput}</a>. Wszelkie prawa zastrzeżone. | <a href="#" class="footer-link">Polityka prywatności RODO.</a>
-    </div>
-  </footer>
-</body>
-</html>`;
+    const $ = (id) => document.getElementById(id);
 
-      // Wyświetlanie wygenerowanego kodu na stronie
-      document.getElementById('code').textContent = code;
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
     }
 
-    function copyCode() {
-      const codeElement = document.getElementById('code');
-      const code = codeElement.textContent;
-
-      // Tworzenie tymczasowego elementu textarea
-      const textarea = document.createElement('textarea');
-      textarea.value = code;
-      textarea.setAttribute('readonly', '');
-      textarea.style.position = 'absolute';
-      textarea.style.left = '-9999px';
-      document.body.appendChild(textarea);
-      
-      // Zaznaczanie i kopiowanie tekstu z textarea
-      textarea.select();
-      document.execCommand('copy');
-
-      // Usuwanie tymczasowego elementu textarea
-      document.body.removeChild(textarea);
-
-      // Zmiana wyglądu przycisku po skopiowaniu kodu
-      const copyButton = document.querySelector('.copy-button');
-      copyButton.textContent = 'Skopiowano!';
-      copyButton.disabled = true;
+    // Dodaje https:// gdy brak protokołu; odrzuca schematy inne niż http(s)
+    function normalizeUrl(value) {
+      const v = value.trim();
+      if (!v) return '';
+      if (/^https?:\/\//i.test(v)) return v;
+      if (/^[a-z][a-z0-9+.-]*:/i.test(v)) return '';
+      return 'https://' + v.replace(/^\/+/, '');
     }
+
+    // Wersja do wyświetlenia: bez protokołu, www i końcowego ukośnika
+    function displayUrl(url) {
+      return url.replace(/^https?:\/\//i, '').replace(/^www\./i, '').replace(/\/+$/, '');
+    }
+
+    function readData() {
+      const d = {};
+      FIELDS.forEach((f) => { d[f] = $(f).value.trim(); });
+      return d;
+    }
+
+    function buildSignature(d) {
+      const accent = /^#[0-9a-f]{6}$/i.test(d.accent) ? d.accent : '#00AEFF';
+      const font = 'font-family:Arial,Helvetica,sans-serif;';
+      const text = 'color:#333333;';
+      const fullName = [d.firstName, d.lastName].filter(Boolean).join(' ');
+      const website = normalizeUrl(d.website);
+      const linkedin = normalizeUrl(d.linkedin);
+      const logoUrl = normalizeUrl(d.logoUrl);
+      const privacyUrl = normalizeUrl(d.privacyUrl);
+      const phoneHref = d.phone.replace(/[^\d+]/g, '');
+      const location = d.city ? d.city + ', Polska' : '';
+      const year = new Date().getFullYear();
+
+      const rows = [];
+      const row = (html, extra = '') =>
+        rows.push(`<tr><td style="${font}${text}${extra}">${html}</td></tr>`);
+
+      if (d.greeting) {
+        row(`<i>${escapeHtml(d.greeting)}</i>`, 'font-size:13px;padding-bottom:8px;');
+      }
+
+      if (fullName) {
+        const nameHtml = linkedin
+          ? `<a href="${escapeHtml(linkedin)}" style="color:#333333;text-decoration:none;">${escapeHtml(fullName)}</a>`
+          : escapeHtml(fullName);
+        row(nameHtml, 'font-size:18px;font-weight:bold;padding-bottom:2px;');
+      }
+
+      const subtitle = [d.jobTitle, d.company].filter(Boolean).map(escapeHtml).join(' | ');
+      if (subtitle) row(subtitle, 'font-size:14px;padding-bottom:2px;');
+      if (location) row(escapeHtml(location), 'font-size:14px;padding-bottom:8px;');
+
+      const contacts = [];
+      if (d.phone) {
+        contacts.push(`<span style="color:${accent};font-weight:bold;">T</span>&nbsp;<a href="tel:${escapeHtml(phoneHref)}" style="color:#333333;text-decoration:none;">${escapeHtml(d.phone)}</a>`);
+      }
+      if (d.email) {
+        contacts.push(`<span style="color:${accent};font-weight:bold;">E</span>&nbsp;<a href="mailto:${escapeHtml(d.email)}" style="color:#333333;text-decoration:none;">${escapeHtml(d.email)}</a>`);
+      }
+      if (linkedin) {
+        contacts.push(`<span style="color:${accent};font-weight:bold;">in</span>&nbsp;<a href="${escapeHtml(linkedin)}" style="color:#333333;text-decoration:none;">LinkedIn</a>`);
+      }
+      if (contacts.length) row(contacts.join('&nbsp;&nbsp;&nbsp;'), 'font-size:13px;padding-bottom:12px;');
+
+      if (logoUrl) {
+        const img = `<img src="${escapeHtml(logoUrl)}" alt="${escapeHtml(d.company || displayUrl(website) || 'Logo')}" width="150" style="display:block;border:0;width:150px;height:auto;">`;
+        row(website ? `<a href="${escapeHtml(website)}">${img}</a>` : img, 'padding-bottom:12px;');
+      } else if (website) {
+        // Przycisk z tabeli, renderowany poprawnie także w Outlooku (bez SVG i CSS z <head>)
+        row(`<table cellpadding="0" cellspacing="0" border="0" role="presentation"><tr>` +
+            `<td bgcolor="${accent}" style="background-color:${accent};border-radius:8px;padding:10px 28px;">` +
+            `<a href="${escapeHtml(website)}" style="${font}font-size:20px;font-weight:bold;color:#ffffff;text-decoration:none;display:inline-block;">${escapeHtml(displayUrl(website))}</a>` +
+            `</td></tr></table>`, 'padding-bottom:12px;');
+      }
+
+      const footer = [];
+      const owner = d.company || (website ? displayUrl(website) : '');
+      if (owner) {
+        const ownerHtml = website
+          ? `<a href="${escapeHtml(website)}" style="color:#333333;">${escapeHtml(owner)}</a>`
+          : escapeHtml(owner);
+        footer.push(`© ${year} ${ownerHtml}. Wszelkie prawa zastrzeżone.`);
+      }
+      if (privacyUrl) {
+        footer.push(`<a href="${escapeHtml(privacyUrl)}" style="color:#333333;">Polityka prywatności (RODO)</a>`);
+      }
+      if (footer.length) row(footer.join(' | '), 'font-size:11px;color:#666666;');
+
+      if (!rows.length) return '';
+
+      return `<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="background-color:#f5f5f5;border-collapse:collapse;">` +
+             `<tr><td style="padding:20px 24px;">` +
+             `<table cellpadding="0" cellspacing="0" border="0" role="presentation">${rows.join('')}</table>` +
+             `</td></tr></table>`;
+    }
+
+    function wrapDocument(signature) {
+      return `<!DOCTYPE html>\n<html lang="pl">\n<head>\n<meta charset="UTF-8">\n<title>Stopka e-mail</title>\n</head>\n<body>\n${signature}\n</body>\n</html>\n`;
+    }
+
+    function render() {
+      const data = readData();
+      const signature = buildSignature(data);
+      $('preview').innerHTML = signature || '<span style="color:#5f6b7a;font-size:14px;">Uzupełnij pola, aby zobaczyć podgląd.</span>';
+      $('code').textContent = signature;
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) { /* brak dostępu do storage */ }
+      return signature;
+    }
+
+    let statusTimer;
+    function showStatus(message) {
+      $('status').textContent = message;
+      clearTimeout(statusTimer);
+      statusTimer = setTimeout(() => { $('status').textContent = ''; }, 4000);
+    }
+
+    // Awaryjne kopiowanie przez zaznaczenie (starsze przeglądarki, brak HTTPS)
+    function legacyCopy(node) {
+      const selection = window.getSelection();
+      const range = document.createRange();
+      range.selectNodeContents(node);
+      selection.removeAllRanges();
+      selection.addRange(range);
+      const ok = document.execCommand('copy');
+      selection.removeAllRanges();
+      return ok;
+    }
+
+    async function copyRich() {
+      const html = render();
+      if (!html) return showStatus('Najpierw uzupełnij formularz.');
+      const plain = $('preview').innerText;
+      try {
+        if (!window.ClipboardItem || !navigator.clipboard?.write) throw new Error('unsupported');
+        await navigator.clipboard.write([new ClipboardItem({
+          'text/html': new Blob([html], { type: 'text/html' }),
+          'text/plain': new Blob([plain], { type: 'text/plain' })
+        })]);
+        showStatus('Skopiowano stopkę. Wklej ją w ustawieniach podpisu.');
+      } catch (e) {
+        showStatus(legacyCopy($('preview')) ? 'Skopiowano stopkę.' : 'Nie udało się skopiować. Zaznacz podgląd ręcznie i użyj Ctrl+C.');
+      }
+    }
+
+    async function copyHtml() {
+      const html = render();
+      if (!html) return showStatus('Najpierw uzupełnij formularz.');
+      try {
+        await navigator.clipboard.writeText(html);
+        showStatus('Skopiowano kod HTML.');
+      } catch (e) {
+        const details = $('code').closest('details');
+        details.open = true;
+        showStatus(legacyCopy($('code')) ? 'Skopiowano kod HTML.' : 'Nie udało się skopiować. Zaznacz kod ręcznie.');
+      }
+    }
+
+    function download() {
+      const html = render();
+      if (!html) return showStatus('Najpierw uzupełnij formularz.');
+      const blob = new Blob([wrapDocument(html)], { type: 'text/html;charset=utf-8' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'stopka.html';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+    }
+
+    function restore() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+        if (saved) FIELDS.forEach((f) => { if (typeof saved[f] === 'string') $(f).value = saved[f]; });
+      } catch (e) { /* ignoruj uszkodzone dane */ }
+    }
+
+    function reset() {
+      FIELDS.forEach((f) => { $(f).value = $(f).defaultValue; });
+      render();
+    }
+
+    restore();
+    $('form').addEventListener('input', render);
+    $('copyRich').addEventListener('click', copyRich);
+    $('copyHtml').addEventListener('click', copyHtml);
+    $('download').addEventListener('click', download);
+    $('reset').addEventListener('click', reset);
+    render();
   </script>
 </body>
 </html>
